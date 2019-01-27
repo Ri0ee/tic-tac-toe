@@ -1,16 +1,57 @@
 #pragma once
 
+#include <string>
+#include <fstream>
+#include <iostream>
+
 #define MAX_FIELD_SIZE 20
+
+#define DIR_RIGHT			1
+#define DIR_LEFT			-1
+#define DIR_TOP_RIGHT		2
+#define DIR_BOTTOM_LEFT		-2
+#define DIR_TOP_LEFT		3
+#define DIR_BOTTOM_RIGHT	-3
+
+enum CellValue {
+	CellPlayer,
+	CellEnemy,
+	CellEmpty,
+	CellOutside,
+	CellUnknown
+};
+
+enum Side {
+	SideCross,
+	SideTick,
+	SideUnknown
+};
 
 class Field
 {
 public:
-	Field() {}
+	Field(int field_w_, int field_h_, Side side_) 
+	{
+		m_status = true;
+		if (!Init(field_w_, field_h_, side_))
+			m_status = false;
+	}
+
+	Field() 
+	{
+		m_status = true;
+		if (!Init(10, 10, SideUnknown))
+			m_status = false;
+	}
+
 	~Field() {}
 
-	bool Init(int field_w_, int field_h_);
-	void Shutdown();
+	bool LoadFromFile(std::string& file_name_);
 	void Clear();
+
+	void SetSide(Side side_) {
+		m_side = side_;
+	}
 
 	void GetSize(int& field_w_, int& field_h_) {
 		field_w_ = m_width;
@@ -22,21 +63,41 @@ public:
 		if (field_h_ > 0 && field_h_ <= MAX_FIELD_SIZE) m_height = field_h_;
 	}
 
-	char GetCell(int row_, int col_)
+	CellValue GetCell(int row_, int col_)
 	{
 		if (col_ >= 0 && col_ <= m_width && row_ >= 0 && row_ <= m_height)
 			return m_field[col_][row_];
 		else
-			return -1;
+			return CellOutside;
 	}
 
-	void SetCell(int row_, int col_, char value_)
+	CellValue GetCell(int row_, int col_, int dir_, int offset)
+	{
+		bool positive = dir_ > 0;
+		if (dir_ == DIR_RIGHT || dir_ == DIR_LEFT)
+			return positive ? GetCell(row_, col_ + offset) : GetCell(row_, col_ - offset);
+		if (dir_ == DIR_TOP_RIGHT || dir_ == DIR_BOTTOM_LEFT)
+			return positive ? GetCell(row_ - offset, col_ - offset) : GetCell(row_ + offset, col_ + offset);
+		if (dir_ == DIR_TOP_LEFT || dir_ == DIR_BOTTOM_RIGHT)
+			return positive ? GetCell(row_ - offset, col_ + offset) : GetCell(row_ + offset, col_ - offset);
+		return CellUnknown;
+	}
+
+	void SetCell(int row_, int col_, CellValue value_)
 	{
 		if (col_ >= 0 && col_ <= m_width && row_ >= 0 && row_ <= m_height)
 			m_field[col_][row_] = value_;
 	}
 
+#ifdef _DEBUG
+	void DebugOutput();
+#endif // _DEBUG
+
 private:
+	bool Init(int field_w_, int field_h_, Side side_);
+	bool m_status;
+
+	Side m_side;
 	int m_width, m_height;
-	char m_field[MAX_FIELD_SIZE][MAX_FIELD_SIZE];
+	CellValue m_field[MAX_FIELD_SIZE][MAX_FIELD_SIZE];
 };

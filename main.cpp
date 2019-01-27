@@ -16,5 +16,9 @@ int main(int argc, char* argv[])
 	Instance instance(argv_vec);
 	instance.Run();
 
+#ifdef _DEBUG
+	system("PAUSE");
+#endif // _DEBUG
+
 	return 0;
 }

@@ -1,5 +1,7 @@
 #pragma once
 
+#include <vector>
+
 #include "field.h"
 
 class Scanner
@@ -10,11 +12,13 @@ public:
 		m_state = true;
 		if (!Init(field_)) m_state = false;
 	}
+
 	~Scanner() {}
 
-	bool Scan();
-	void Pattern_point();
-	void Pattern_dir();
+	bool Scan(std::vector<unsigned char>& bit_patterns_);
+	void PatternPoint(int row_, int col_, std::vector<unsigned char> bit_patterns_);
+	unsigned char PatternDir(int row_, int col_, int dir_);
+	bool ValidatePattern(unsigned char& bit_pattern_);
 
 private:
 	bool Init(Field* field_);

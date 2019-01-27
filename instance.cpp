@@ -3,26 +3,24 @@
 //variable initialization, command processing and data reading method
 bool Instance::Init(std::vector<std::string>& argv_list_)
 {
-	m_field.Clear();
-	m_player_side = PLAYER_SIDE_UNKNOWN;
 	m_input_file_name = argv_list_[1];
 	m_output_file_name = argv_list_[2];
 
 	if (argv_list_[0] == "X")
 	{
-		if (!ReadData()) return false;
-		m_player_side = PLAYER_SIDE_CROSS;
+		m_field.SetSide(SideCross);
+		if (!m_field.LoadFromFile(m_input_file_name)) return false;
 		return true;
 	}
 
-	if (argv_list_[1] == "0")
+	if (argv_list_[0] == "0")
 	{
-		if (!ReadData()) return false;
-		m_player_side = PLAYER_SIDE_TICK;
+		m_field.SetSide(SideTick);
+		if (!m_field.LoadFromFile(m_input_file_name)) return false;
 		return true;
 	}
 
-	if (argv_list_[2] == "INFO")
+	if (argv_list_[0] == "INFO")
 	{
 		if (!WriteInfo()) return false;
 		return true;
@@ -35,25 +33,12 @@ bool Instance::Init(std::vector<std::string>& argv_list_)
 bool Instance::Run()
 {
 	if (m_state == false) return false;
-}
 
-//read game field state
-bool Instance::ReadData()
-{
-	m_field.SetSize(10, 10);
-	std::fstream input_file(m_input_file_name, std::ios::in);
-	if (!input_file.is_open()) return false;
+	Scanner scanner(&m_field);
+	std::vector<unsigned char> bit_patterns;
 
-	for (int row = 0; row < 10; row++)
-	{
-		std::string row_data;
-		std::getline(input_file, row_data);
+	scanner.Scan(bit_patterns);
 
-		for (int col = 0; col < 10; col++)
-			m_field.SetCell(row, col, row_data[col]);
-	}
-
-	input_file.close();
 	return true;
 }
 
