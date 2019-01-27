@@ -25,7 +25,7 @@ void Scanner::PatternPoint(int row_, int col_, std::vector<Pattern>& patterns_)
 	if (current_cell == CellOutside) return;
 	if (current_cell == CellUnknown) return;
 
-	for (int dir = 1; dir <= 3; dir++)
+	for (int dir = 1; dir <= 4; dir++)
 	{
 		Pattern p1 = PatternDir(row_, col_, dir);
 		Pattern p2 = PatternDir(row_, col_, -dir);

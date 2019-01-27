@@ -30,8 +30,6 @@ void Field::DebugOutput()
 		std::cout << "\n";
 	}
 	std::cout << "\n";
-
-	std::cout << "GetCell: " << GetCell(5, 4, 2, 1) << "\n";
 }
 #endif // _DEBUG
 

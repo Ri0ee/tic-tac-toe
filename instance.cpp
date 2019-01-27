@@ -38,16 +38,83 @@ bool Instance::Run()
 {
 	if (m_state == false) return false;
 
+	std::vector<Pattern> valuable_offensive_patterns;
+	std::vector<Pattern> valuable_defensive_patterns;
+	int valuable_pattern_offensive_value = 0;
+	int valuable_pattern_defensive_value = 0;
+
 	Scanner scanner(&m_field);
 	std::vector<Pattern> patterns;
-
 	scanner.Scan(patterns);
+
+	for (auto pattern : patterns)
+	{
+		int current_offensive_value = 0;
+		for (int i = 0; i < 5; i++) // Scan for offensive patterns
+		{
+			if (pattern[i] == CellPlayer)
+			{
+				current_offensive_value++;
+				continue;
+			}
+
+			if (pattern[i] == CellEnemy || pattern[i] == CellOutside)
+			{
+				current_offensive_value = -1;
+				break;
+			}
+		}
+
+		if (current_offensive_value == valuable_pattern_offensive_value)
+			valuable_offensive_patterns.push_back(pattern);
+
+		if (current_offensive_value > valuable_pattern_offensive_value)
+		{
+			valuable_offensive_patterns.clear();
+			valuable_offensive_patterns.push_back(pattern);
+			valuable_pattern_offensive_value = current_offensive_value;
+		}
+
+		int current_defensive_value = 0;
+		for (int i = 0; i < 5; i++) // Scan for defensive patterns
+		{
+			if (pattern[i] == CellEnemy)
+			{
+				current_defensive_value++;
+				continue;
+			}
+
+			if (pattern[i] == CellPlayer || pattern[i] == CellOutside)
+			{
+				current_defensive_value = -1;
+				break;
+			}
+		}
+
+		if (current_defensive_value == valuable_pattern_defensive_value)
+			valuable_defensive_patterns.push_back(pattern);
+
+		if (current_defensive_value > valuable_pattern_defensive_value)
+		{
+			valuable_defensive_patterns.clear();
+			valuable_defensive_patterns.push_back(pattern);
+			valuable_pattern_defensive_value = current_defensive_value;
+		}
+	}
 
 	for (auto pattern : patterns)
 	{
 		for (int i = 0; i < 5; i++)
 			std::cout << pattern[i] << " ";
+		std::cout << "\n";
+	}
 
+	std::cout << "\n";
+
+	for (auto pattern : valuable_offensive_patterns)
+	{
+		for (int i = 0; i < 5; i++)
+			std::cout << pattern[i] << " ";
 		std::cout << "\n";
 	}
 
