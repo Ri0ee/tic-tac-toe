@@ -47,11 +47,13 @@ bool Instance::Run()
 	std::vector<Pattern> patterns;
 	scanner.Scan(patterns);
 
-	for (auto pattern : patterns)
+	for (auto pattern : patterns) // Scanning for the best offensive and defensive patterns
 	{
 		int current_offensive_value = 0;
 		for (int i = 0; i < 5; i++) // Scan for offensive patterns
 		{
+			if (pattern.GetValue() == -1) break;
+
 			if (pattern[i] == CellPlayer)
 			{
 				current_offensive_value++;
@@ -78,6 +80,8 @@ bool Instance::Run()
 		int current_defensive_value = 0;
 		for (int i = 0; i < 5; i++) // Scan for defensive patterns
 		{
+			if (pattern.GetValue() == -1) break;
+
 			if (pattern[i] == CellEnemy)
 			{
 				current_defensive_value++;
@@ -102,35 +106,57 @@ bool Instance::Run()
 		}
 	}
 
-	for (auto pattern : patterns)
+	int move_row, move_col;
+	for (int i = 4; i > 0; i--)
 	{
-		for (int i = 0; i < 5; i++)
-			std::cout << pattern[i] << " ";
-		std::cout << "\n";
+		Pattern temp_pattern;
+		if (valuable_pattern_defensive_value < valuable_pattern_offensive_value)
+			temp_pattern = valuable_offensive_patterns[0];
+		else
+			temp_pattern = valuable_defensive_patterns[0];
+
+		if (temp_pattern[i] == CellEmpty)
+		{
+			move_row = temp_pattern.m_row;
+			move_col = temp_pattern.m_col;
+
+			int dir = temp_pattern.m_dir;
+			bool positive = dir > 0;
+			if (dir == DIR_RIGHT || dir == DIR_LEFT)
+				move_col = positive ? move_col + i : move_col - i;
+
+			if (dir == DIR_TOP || dir == DIR_BOTTOM)
+				move_row = positive ? move_row - i : move_row + i;
+
+			if (dir == DIR_TOP_RIGHT || dir == DIR_BOTTOM_LEFT)
+			{
+				move_col = positive ? move_col + i : move_col - i;
+				move_row = positive ? move_row - i : move_row + i;
+			}
+
+			if (dir == DIR_TOP_LEFT || dir == DIR_BOTTOM_RIGHT)
+			{
+				move_col = positive ? move_col - i : move_col + i;
+				move_row = positive ? move_row - i : move_row + i;
+			}
+
+			break;
+		}
 	}
 
-	std::cout << "\n";
-
-	for (auto pattern : valuable_offensive_patterns)
-	{
-		for (int i = 0; i < 5; i++)
-			std::cout << pattern[i] << " ";
-		std::cout << "\n";
-	}
-
-	return true;
+	return WriteData(move_row, move_col);;
 }
 
 //write move information into output file
-bool Instance::WriteData()
+bool Instance::WriteData(int row_, int col_)
 {
 	std::fstream output_file(m_output_file_name, std::ios::out);
 	if (!output_file.is_open()) return false;
 
-	//output_file << TranslateMove(m_final_move.row, m_final_move.col) << "\n";
+	output_file << TranslateMove(row_, col_) << "\n";
 
 	output_file.close();
-	return false;
+	return true;
 }
 
 //write information on INFO command
@@ -143,14 +169,17 @@ bool Instance::WriteInfo()
 	output_file << "C2";
 
 	output_file.close();
-	return false;
+	return true;
 }
 
 //translate position into letters A-J and numbers 0-9
 std::string Instance::TranslateMove(int row, int col)
 {
 	std::string temp_string("");
-	temp_string.append((char*)('A' + col));
+	char letter[2];
+	letter[0] = 'A' + col;
+	letter[1] = '\0';
+	temp_string.append(letter);
 	temp_string.append(std::to_string(row));
 
 	return temp_string;

@@ -19,7 +19,7 @@ private:
 	void Init(std::vector<std::string>& argv_list_);
 	bool m_state;
 
-	bool WriteData();
+	bool WriteData(int row_, int col_);
 	bool WriteInfo();
 	std::string TranslateMove(int row_, int col_);
 
