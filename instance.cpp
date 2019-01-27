@@ -1,7 +1,7 @@
 #include "instance.h"
 
 //variable initialization, command processing and data reading method
-bool Instance::Init(std::vector<std::string>& argv_list_)
+void Instance::Init(std::vector<std::string>& argv_list_)
 {
 	m_input_file_name = argv_list_[1];
 	m_output_file_name = argv_list_[2];
@@ -9,24 +9,28 @@ bool Instance::Init(std::vector<std::string>& argv_list_)
 	if (argv_list_[0] == "X")
 	{
 		m_field.SetSide(SideCross);
-		if (!m_field.LoadFromFile(m_input_file_name)) return false;
-		return true;
+		if (!m_field.LoadFromFile(m_input_file_name)) return;
+
+		m_state = true;
+		return;
 	}
 
 	if (argv_list_[0] == "0")
 	{
 		m_field.SetSide(SideTick);
-		if (!m_field.LoadFromFile(m_input_file_name)) return false;
-		return true;
+		if (!m_field.LoadFromFile(m_input_file_name)) return;
+
+		m_state = true;
+		return;
 	}
 
 	if (argv_list_[0] == "INFO")
 	{
-		if (!WriteInfo()) return false;
-		return true;
-	}
+		if (!WriteInfo()) return;
 
-	return false; //command unknown
+		m_state = true;
+		return;
+	}
 }
 
 //main solution-finding method
@@ -35,9 +39,17 @@ bool Instance::Run()
 	if (m_state == false) return false;
 
 	Scanner scanner(&m_field);
-	std::vector<unsigned char> bit_patterns;
+	std::vector<Pattern> patterns;
 
-	scanner.Scan(bit_patterns);
+	scanner.Scan(patterns);
+
+	for (auto pattern : patterns)
+	{
+		for (int i = 0; i < 5; i++)
+			std::cout << pattern[i] << " ";
+
+		std::cout << "\n";
+	}
 
 	return true;
 }

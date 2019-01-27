@@ -8,10 +8,12 @@
 
 #define DIR_RIGHT			1
 #define DIR_LEFT			-1
-#define DIR_TOP_RIGHT		2
-#define DIR_BOTTOM_LEFT		-2
-#define DIR_TOP_LEFT		3
-#define DIR_BOTTOM_RIGHT	-3
+#define DIR_TOP				2
+#define DIR_BOTTOM			-2
+#define DIR_TOP_RIGHT		3
+#define DIR_BOTTOM_LEFT		-3
+#define DIR_TOP_LEFT		4
+#define DIR_BOTTOM_RIGHT	-4
 
 enum CellValue {
 	CellPlayer,
@@ -65,7 +67,7 @@ public:
 
 	CellValue GetCell(int row_, int col_)
 	{
-		if (col_ >= 0 && col_ <= m_width && row_ >= 0 && row_ <= m_height)
+		if (col_ >= 0 && col_ < m_width && row_ >= 0 && row_ < m_height)
 			return m_field[col_][row_];
 		else
 			return CellOutside;
@@ -76,10 +78,16 @@ public:
 		bool positive = dir_ > 0;
 		if (dir_ == DIR_RIGHT || dir_ == DIR_LEFT)
 			return positive ? GetCell(row_, col_ + offset) : GetCell(row_, col_ - offset);
+
+		if (dir_ == DIR_TOP || dir_ == DIR_BOTTOM)
+			return positive ? GetCell(row_ - offset, col_) : GetCell(row_ + offset, col_);
+
 		if (dir_ == DIR_TOP_RIGHT || dir_ == DIR_BOTTOM_LEFT)
 			return positive ? GetCell(row_ - offset, col_ - offset) : GetCell(row_ + offset, col_ + offset);
+
 		if (dir_ == DIR_TOP_LEFT || dir_ == DIR_BOTTOM_RIGHT)
 			return positive ? GetCell(row_ - offset, col_ + offset) : GetCell(row_ + offset, col_ - offset);
+
 		return CellUnknown;
 	}
 

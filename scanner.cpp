@@ -1,38 +1,24 @@
 #include "scanner.h"
 
-bool Scanner::Init(Field* field_)
+void Scanner::Scan(std::vector<Pattern>& patterns_)
 {
-	m_field = field_;
-
-	return true;
-}
-
-bool Scanner::Scan(std::vector<unsigned char>& bit_patterns_)
-{
-	if (m_state == false) return false;
-
-	int fw, fh;
-	m_field->GetSize(fw, fh);
-
-	for (int row = 0; row < fh; row++)
+	for (int row = 0; row < 10; row++)
 	{
-		for (int col = 0; col < fw; col++)
+		for (int col = 0; col < 10; col++)
 		{
-			std::vector<unsigned char> temp_bit_patterns;
-			PatternPoint(row, col, temp_bit_patterns);
+			std::vector<Pattern> temp_patterns;
+			PatternPoint(row, col, temp_patterns);
 
-			while (!temp_bit_patterns.empty())
+			while (!temp_patterns.empty())
 			{
-				bit_patterns_.push_back(*temp_bit_patterns.end());
-				temp_bit_patterns.erase(temp_bit_patterns.end());
+				patterns_.push_back(*(temp_patterns.end() - 1));
+				temp_patterns.erase(temp_patterns.end() - 1);
 			}
 		}
 	}
-
-	return true;
 }
 
-void Scanner::PatternPoint(int row_, int col_, std::vector<unsigned char> bit_patterns_)
+void Scanner::PatternPoint(int row_, int col_, std::vector<Pattern>& patterns_)
 {
 	CellValue current_cell = m_field->GetCell(row_, col_);
 	if (current_cell == CellEmpty) return;
@@ -41,27 +27,32 @@ void Scanner::PatternPoint(int row_, int col_, std::vector<unsigned char> bit_pa
 
 	for (int dir = 1; dir <= 3; dir++)
 	{
-		unsigned char res1 = PatternDir(row_, col_, dir);
-		unsigned char res2 = PatternDir(row_, col_, -dir);
+		Pattern p1 = PatternDir(row_, col_, dir);
+		Pattern p2 = PatternDir(row_, col_, -dir);
 
-		if (res1 != 0) bit_patterns_.push_back(res1);
-		if (res2 != 0) bit_patterns_.push_back(res2);
+		if (!p1.IsEmpty() && p1.GetValue() != -1) patterns_.push_back(p1);
+		if (!p2.IsEmpty() && p2.GetValue() != -1) patterns_.push_back(p2);
 	}
 }
 
-unsigned char Scanner::PatternDir(int row_, int col_, int dir_)
+Pattern Scanner::PatternDir(int row_, int col_, int dir_)
 {
-	unsigned char temp_bit_pattern = 0;
+	Pattern temp_pattern(row_, col_, dir_, nullptr);
 
+	bool failed_pattern = false;
 	for (int offset = 0; offset < 5; offset++)
 	{
+		CellValue temp_cell = m_field->GetCell(row_, col_, dir_, offset);
+		if (temp_cell == CellOutside)
+			temp_pattern.SetValue(-1);
 
+		temp_pattern[offset] = temp_cell;
 	}
 
-	return temp_bit_pattern;
+	return temp_pattern;
 }
 
-bool Scanner::ValidatePattern(unsigned char& bit_pattern_)
+bool Scanner::ValidatePattern(Pattern& pattern_)
 {
 	return true;
 }

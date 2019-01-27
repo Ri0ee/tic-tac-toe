@@ -10,17 +10,13 @@
 class Instance
 {
 public:
-	Instance(std::vector<std::string>& argv_list_) 
-	{
-		m_state = true;
-		if (!Init(argv_list_)) m_state = false;
-	}
+	Instance(std::vector<std::string>& argv_list_) : m_state(false) { Init(argv_list_); }
 	~Instance() {}
 
 	bool Run();
 
 private:
-	bool Init(std::vector<std::string>& argv_list_);
+	void Init(std::vector<std::string>& argv_list_);
 	bool m_state;
 
 	bool WriteData();
