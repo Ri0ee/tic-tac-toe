@@ -1,1 +1,0 @@
-start "" tic-tac-toe.exe "0" "field.in" "field.out"
