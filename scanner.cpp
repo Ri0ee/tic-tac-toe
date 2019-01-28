@@ -39,7 +39,6 @@ Pattern Scanner::PatternDir(int row_, int col_, int dir_)
 {
 	Pattern temp_pattern(row_, col_, dir_, nullptr);
 
-	bool failed_pattern = false;
 	for (int offset = 0; offset < 5; offset++)
 	{
 		CellValue temp_cell = m_field->GetCell(row_, col_, dir_, offset);

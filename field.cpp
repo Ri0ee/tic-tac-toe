@@ -33,17 +33,6 @@ void Field::DebugOutput()
 }
 #endif // _DEBUG
 
-bool Field::Init(int field_w_, int field_h_, Side side_)
-{
-	if (field_w_ > MAX_FIELD_SIZE || field_h_ > MAX_FIELD_SIZE) return false;
-
-	m_width = field_w_;
-	m_height = field_h_;
-	m_side = side_;
-
-	return true;
-}
-
 void Field::Clear()
 {
 	for (int row = 0; row < m_height; row++)
@@ -54,6 +43,7 @@ void Field::Clear()
 bool Field::LoadFromFile(std::string& file_name_)
 {
 	if (m_side == SideUnknown) return false;
+	if (file_name_.empty()) return false;
 
 	std::fstream input_file(file_name_, std::ios::in);
 	if (!input_file.is_open()) return false;

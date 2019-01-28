@@ -32,20 +32,8 @@ enum Side {
 class Field
 {
 public:
-	Field(int field_w_, int field_h_, Side side_) 
-	{
-		m_status = true;
-		if (!Init(field_w_, field_h_, side_))
-			m_status = false;
-	}
-
-	Field() 
-	{
-		m_status = true;
-		if (!Init(10, 10, SideUnknown))
-			m_status = false;
-	}
-
+	Field(int field_w_, int field_h_, Side side_) : m_width(field_w_), m_height(field_h_), m_side(side_) {}
+	Field() : m_width(10), m_height(10), m_side(SideUnknown) {}
 	~Field() {}
 
 	bool LoadFromFile(std::string& file_name_);
@@ -69,8 +57,7 @@ public:
 	{
 		if (col_ >= 0 && col_ < m_width && row_ >= 0 && row_ < m_height)
 			return m_field[col_][row_];
-		else
-			return CellOutside;
+		else return CellOutside;
 	}
 
 	CellValue GetCell(int row_, int col_, int dir_, int offset)
@@ -102,9 +89,6 @@ public:
 #endif // _DEBUG
 
 private:
-	bool Init(int field_w_, int field_h_, Side side_);
-	bool m_status;
-
 	Side m_side;
 	int m_width, m_height;
 	CellValue m_field[MAX_FIELD_SIZE][MAX_FIELD_SIZE];
