@@ -19,6 +19,9 @@ private:
 	void Init(std::vector<std::string>& argv_list_);
 	bool m_state;
 
+	void FindBestPatterns(std::vector<Pattern>& offensive_patterns_, std::vector<Pattern>& defensive_patterns_, std::vector<Pattern>& all_patterns_);
+	void MakeDecision(std::vector<Pattern>& offensive_patterns_, std::vector<Pattern>& defensive_patterns_, int& move_row_, int& move_col_);
+
 	bool WriteData(int row_, int col_);
 	bool WriteInfo();
 	std::string TranslateMove(int row_, int col_);
