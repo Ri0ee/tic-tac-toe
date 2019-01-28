@@ -83,10 +83,10 @@ public:
 			return positive ? GetCell(row_ - offset, col_) : GetCell(row_ + offset, col_);
 
 		if (dir_ == DIR_TOP_RIGHT || dir_ == DIR_BOTTOM_LEFT)
-			return positive ? GetCell(row_ - offset, col_ - offset) : GetCell(row_ + offset, col_ + offset);
+			return positive ? GetCell(row_ - offset, col_ + offset) : GetCell(row_ + offset, col_ - offset);
 
 		if (dir_ == DIR_TOP_LEFT || dir_ == DIR_BOTTOM_RIGHT)
-			return positive ? GetCell(row_ - offset, col_ + offset) : GetCell(row_ + offset, col_ - offset);
+			return positive ? GetCell(row_ - offset, col_ - offset) : GetCell(row_ + offset, col_ + offset);
 
 		return CellUnknown;
 	}

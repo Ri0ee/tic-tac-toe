@@ -47,6 +47,20 @@ bool Instance::Run()
 	std::vector<Pattern> patterns;
 	scanner.Scan(patterns);
 
+#ifdef _DEBUG
+	for (auto pattern : patterns)
+	{
+		for (int i = 0; i < 5; i++)
+		{
+			if (pattern[i] == CellPlayer) std::cout << "P ";
+			if (pattern[i] == CellEnemy) std::cout << "N ";
+			if (pattern[i] == CellEmpty) std::cout << ". ";
+			if (pattern[i] == CellOutside) std::cout << "# ";
+		}
+		std::cout << "\n";
+	}
+#endif // _DEBUG
+
 	for (auto pattern : patterns) // Scanning for the best offensive and defensive patterns
 	{
 		int current_offensive_value = 0;
@@ -153,7 +167,7 @@ bool Instance::WriteData(int row_, int col_)
 	std::fstream output_file(m_output_file_name, std::ios::out);
 	if (!output_file.is_open()) return false;
 
-	output_file << TranslateMove(row_, col_) << "\n";
+	output_file << TranslateMove(row_, col_);
 
 	output_file.close();
 	return true;

@@ -74,7 +74,6 @@ public:
 	void Scan(std::vector<Pattern>& patterns_);
 	void PatternPoint(int row_, int col_, std::vector<Pattern>& patterns_);
 	Pattern PatternDir(int row_, int col_, int dir_);
-	bool ValidatePattern(Pattern& pattern_);
 
 private:
 	Field* m_field = nullptr;

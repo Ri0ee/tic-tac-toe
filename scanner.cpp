@@ -51,8 +51,3 @@ Pattern Scanner::PatternDir(int row_, int col_, int dir_)
 
 	return temp_pattern;
 }
-
-bool Scanner::ValidatePattern(Pattern& pattern_)
-{
-	return true;
-}
