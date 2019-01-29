@@ -26,6 +26,7 @@ void Instance::Init(std::vector<std::string>& argv_list_)
 
 	if (argv_list_[0] == "INFO")
 	{
+		m_info_step = true;
 		if (!WriteInfo()) return;
 
 		m_state = true;
@@ -36,6 +37,7 @@ void Instance::Init(std::vector<std::string>& argv_list_)
 //main solution-finding method
 bool Instance::Run()
 {
+	if (m_info_step == true) return true;
 	if (m_state == false) return false;
 
 	Scanner scanner(&m_field);
@@ -45,8 +47,6 @@ bool Instance::Run()
 	int move_row = 0, move_col = 0;
 
 	scanner.Scan(patterns);
-	FindBestPatterns(offensive_patterns, defensive_patterns, patterns);
-	MakeDecision(offensive_patterns, defensive_patterns, move_row, move_col);
 
 #ifdef _DEBUG
 	for (auto pattern : patterns)
@@ -54,13 +54,16 @@ bool Instance::Run()
 		for (int i = 0; i < 5; i++)
 		{
 			if (pattern[i] == CellPlayer) std::cout << "P ";
-			if (pattern[i] == CellEnemy) std::cout << "N ";
+			if (pattern[i] == CellEnemy) std::cout << "E ";
 			if (pattern[i] == CellEmpty) std::cout << ". ";
 			if (pattern[i] == CellOutside) std::cout << "# ";
 		}
 		std::cout << "\n";
 	}
 #endif // _DEBUG
+
+	FindBestPatterns(offensive_patterns, defensive_patterns, patterns);
+	MakeDecision(offensive_patterns, defensive_patterns, move_row, move_col);
 
 	return WriteData(move_row, move_col);;
 }
@@ -75,7 +78,7 @@ void Instance::FindBestPatterns(std::vector<Pattern>& offensive_patterns_, std::
 		int current_offensive_value = 0;
 		for (int i = 0; i < 5; i++) // Scan for offensive patterns
 		{
-			if (pattern.GetValue() == -1) break;
+			if (pattern.GetValue(true) == -1) break;
 
 			if (pattern[i] == CellPlayer)
 			{
@@ -88,6 +91,17 @@ void Instance::FindBestPatterns(std::vector<Pattern>& offensive_patterns_, std::
 				current_offensive_value = -1;
 				break;
 			}
+		}
+
+		pattern.SetValue(current_offensive_value, true);
+
+		if (current_offensive_value == 4) // On the next move there will be my win
+		{
+			offensive_patterns_.clear();
+			offensive_patterns_.push_back(pattern);
+
+			defensive_patterns_.clear();
+			break;
 		}
 
 		if (current_offensive_value == valuable_pattern_offensive_value)
@@ -103,7 +117,7 @@ void Instance::FindBestPatterns(std::vector<Pattern>& offensive_patterns_, std::
 		int current_defensive_value = 0;
 		for (int i = 0; i < 5; i++) // Scan for defensive patterns
 		{
-			if (pattern.GetValue() == -1) break;
+			if (pattern.GetValue(false) == -1) break;
 
 			if (pattern[i] == CellEnemy)
 			{
@@ -117,6 +131,8 @@ void Instance::FindBestPatterns(std::vector<Pattern>& offensive_patterns_, std::
 				break;
 			}
 		}
+
+		pattern.SetValue(current_defensive_value, false);
 
 		if (current_defensive_value == valuable_pattern_defensive_value)
 			defensive_patterns_.push_back(pattern);
@@ -132,16 +148,64 @@ void Instance::FindBestPatterns(std::vector<Pattern>& offensive_patterns_, std::
 
 void Instance::MakeDecision(std::vector<Pattern>& offensive_patterns_, std::vector<Pattern>& defensive_patterns_, int& move_row_, int& move_col_)
 {
-	int valuable_pattern_offensive_value = offensive_patterns_[0].GetValue();
-	int valuable_pattern_defensive_value = defensive_patterns_[0].GetValue();
+	if (offensive_patterns_.empty() && defensive_patterns_.empty())
+	{
+		if (m_field.IsEmpty()) // Initial move
+		{
+			move_row_ = 4;
+			move_col_ = 4;
+		}
+		else
+		{
+			move_row_ = 0;
+			move_col_ = 0;
+			int pattern_quality = 0;
 
-	for (int i = 4; i > 0; i--)
+			int first_empty_row = -1;
+			int first_empty_col = -1;
+
+			for(int row = 0; row < 10; row++)
+				for(int col = 0; col < 10; col++)
+					if (m_field.GetCell(row, col) == CellEmpty)
+					{
+						if (first_empty_row == -1) first_empty_row = row;
+						if (first_empty_col == -1) first_empty_col = col;
+
+						std::vector<Pattern> temp_patterns;
+						Scanner scanner(&m_field);
+
+						scanner.PatternPoint(row, col, temp_patterns, true);
+
+						if (temp_patterns.size() > pattern_quality)
+						{
+							pattern_quality = temp_patterns.size();
+							move_row_ = row;
+							move_col_ = col;
+						}
+					}
+
+			if (pattern_quality == 0)
+			{
+				move_row_ = first_empty_row;
+				move_col_ = first_empty_col;
+			}
+		}
+
+		return;
+	}
+
+	int valuable_pattern_offensive_value = 0;
+	int valuable_pattern_defensive_value = 0;
+	if(!offensive_patterns_.empty()) valuable_pattern_offensive_value = offensive_patterns_[0].GetValue(true);
+	if(!defensive_patterns_.empty()) valuable_pattern_defensive_value = defensive_patterns_[0].GetValue(false);
+
+	for (int i = 0; i < 5; i++)
 	{
 		Pattern temp_pattern;
-		if (valuable_pattern_defensive_value < valuable_pattern_offensive_value)
-			temp_pattern = offensive_patterns_[0];
-		else
+		if (valuable_pattern_offensive_value < valuable_pattern_defensive_value)
 			temp_pattern = defensive_patterns_[0];
+		else
+			temp_pattern = offensive_patterns_[0];
 
 		if (temp_pattern[i] == CellEmpty)
 		{

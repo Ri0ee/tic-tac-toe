@@ -84,6 +84,14 @@ public:
 			m_field[col_][row_] = value_;
 	}
 
+	bool IsEmpty()
+	{
+		for (int row = 0; row < m_height; row++)
+			for (int col = 0; col < m_width; col++)
+				if (GetCell(row, col) != CellEmpty) return false;
+		return true;
+	}
+
 #ifdef _DEBUG
 	void DebugOutput();
 #endif // _DEBUG

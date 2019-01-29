@@ -10,7 +10,7 @@
 class Instance
 {
 public:
-	Instance(std::vector<std::string>& argv_list_) : m_state(false) { Init(argv_list_); }
+	Instance(std::vector<std::string>& argv_list_) : m_state(false), m_info_step(false) { Init(argv_list_); }
 	~Instance() {}
 
 	bool Run();
@@ -29,4 +29,6 @@ private:
 	Field m_field;
 	std::string m_input_file_name;
 	std::string m_output_file_name;
+
+	bool m_info_step;
 };

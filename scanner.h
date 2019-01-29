@@ -6,15 +6,17 @@
 
 struct Pattern
 {
-	Pattern() : m_value(0), m_dir(0), m_col(0), m_row(0)
+	Pattern() : m_offensive_value(0), m_defensive_value(0), m_dir(0), m_col(0), m_row(0)
 	{
-		memset((void*)m_pattern, CellUnknown, sizeof(CellValue));
+		for (int i = 0; i < 5; i++) m_pattern[i] = CellUnknown;
 	}
 
-	Pattern(int row_, int col_, int dir_, CellValue pattern_[5]) : m_value(0), m_row(row_), m_col(col_), m_dir(dir_)
+	Pattern(int row_, int col_, int dir_, CellValue pattern_[5]) : m_offensive_value(0), m_defensive_value(0), m_row(row_), m_col(col_), m_dir(dir_)
 	{
-		if(pattern_ != nullptr) memcpy((void*)m_pattern, (void*)pattern_, sizeof(CellValue));
-		else memset((void*)m_pattern, CellUnknown, sizeof(CellValue));
+		if (pattern_ != nullptr)
+			for (int i = 0; i < 5; i++) m_pattern[i] = pattern_[i];
+		else 
+			for (int i = 0; i < 5; i++) m_pattern[i] = CellUnknown;
 	}
 
 	bool operator==(Pattern& pattern_)
@@ -38,7 +40,7 @@ struct Pattern
 		return m_pattern[index_];
 	}
 
-	bool IsEmpty() 
+	bool Exists()
 	{
 		for (int i = 0; i < 5; i++)
 			if (m_pattern[i] != CellUnknown) return false;
@@ -46,14 +48,26 @@ struct Pattern
 		return true;
 	}
 
-	int GetValue()
+	bool Empty() 
 	{
-		return m_value;
+		for (int i = 0; i < 5; i++)
+			if (m_pattern[i] != CellEmpty) return false;
+
+		return true;
 	}
 
-	void SetValue(int value_)
+	int GetValue(bool offensive_)
 	{
-		m_value = value_;
+		if (offensive_) return m_offensive_value;
+		return m_defensive_value;
+	}
+
+	void SetValue(int value_, bool offensive_)
+	{
+		if (offensive_)
+			m_offensive_value = value_;
+		else
+			m_defensive_value = value_;
 	}
 
 	int m_row;
@@ -61,7 +75,8 @@ struct Pattern
 	int m_dir;
 
 private:
-	int m_value;
+	int m_offensive_value;
+	int m_defensive_value;
 	CellValue m_pattern[5];
 };
 
@@ -72,8 +87,9 @@ public:
 	~Scanner() {}
 
 	void Scan(std::vector<Pattern>& patterns_);
-	void PatternPoint(int row_, int col_, std::vector<Pattern>& patterns_);
+	void PatternPoint(int row_, int col_, std::vector<Pattern>& patterns_, bool potential_);
 	Pattern PatternDir(int row_, int col_, int dir_);
+	bool ValidatePattern(Pattern& pattern_);
 
 private:
 	Field* m_field = nullptr;
