@@ -1,17 +1,48 @@
 #include "scanner.h"
 
-#define IMPORTANT_PATTERN_AMOUNT 4
+#define IMPORTANT_PATTERN_AMOUNT 14
 
-CellValue important_patterns[IMPORTANT_PATTERN_AMOUNT][5] =
+std::vector<Pattern> important_patterns;
+CellValue static_patterns[IMPORTANT_PATTERN_AMOUNT][5] =
 {
-{CellEmpty, CellEnemy,	CellEnemy,	CellEnemy,	CellEmpty},
-{CellEmpty, CellPlayer, CellPlayer, CellPlayer, CellEmpty},
-{CellEmpty, CellEnemy, CellEnemy, CellEmpty, CellEnemy},
-{CellEnemy, CellEnemy, CellEmpty, CellEnemy, CellEmpty}
+{CellPlayer, CellPlayer, CellPlayer, CellPlayer, CellEmpty},	// 4
+{CellEnemy, CellEnemy,	CellEnemy,	CellEnemy,	CellEmpty},		// 4
+{CellPlayer, CellEmpty, CellPlayer, CellPlayer, CellPlayer},	// 4
+{CellEnemy, CellEmpty, CellEnemy, CellEnemy, CellEnemy},		// 4
+{CellPlayer, CellPlayer, CellEmpty, CellPlayer, CellPlayer},	// 4
+{CellEnemy, CellEnemy, CellEmpty, CellEnemy, CellEnemy},		// 4
+
+{CellEmpty,	CellEnemy,	CellEnemy,	CellEnemy,	CellEmpty},		// Open 3
+{CellEmpty,	CellPlayer,	CellPlayer, CellPlayer, CellEmpty},		// Open 3
+
+{CellEmpty,	CellEnemy,	CellEnemy,	CellEmpty,	CellEnemy},		// Open 3
+{CellEnemy,	CellEnemy,	CellEmpty,	CellEnemy,	CellEmpty},		// Open 3
+{CellPlayer,CellPlayer,	CellEmpty,	CellPlayer,	CellEmpty},		// Open 3
+{CellEmpty,	CellPlayer,	CellPlayer,	CellEmpty,	CellPlayer},	// Open 3
+
+{CellEnemy,	CellPlayer,	CellPlayer, CellPlayer, CellEmpty},		// Closed 3
+{CellPlayer,CellEnemy,	CellEnemy,	CellEnemy,	CellEmpty}		// Closed 3
 };
 
 void Scanner::Scan(std::vector<Pattern>& patterns_)
 {
+	important_patterns.push_back(Pattern(static_patterns[0], 1000));
+	important_patterns.push_back(Pattern(static_patterns[1], 1000));
+	important_patterns.push_back(Pattern(static_patterns[2], 1000));
+	important_patterns.push_back(Pattern(static_patterns[3], 1000));
+	important_patterns.push_back(Pattern(static_patterns[4], 1000));
+	important_patterns.push_back(Pattern(static_patterns[5], 1000));
+
+	important_patterns.push_back(Pattern(static_patterns[6], 200));
+	important_patterns.push_back(Pattern(static_patterns[7], 300));
+	important_patterns.push_back(Pattern(static_patterns[8], 200));
+	important_patterns.push_back(Pattern(static_patterns[9], 200));
+	important_patterns.push_back(Pattern(static_patterns[10], 300));
+	important_patterns.push_back(Pattern(static_patterns[11], 300));
+
+	important_patterns.push_back(Pattern(static_patterns[12], 60));
+	important_patterns.push_back(Pattern(static_patterns[13], 50));
+
 	for (int row = 0; row < 10; row++)
 	{
 		for (int col = 0; col < 10; col++)
@@ -41,7 +72,7 @@ void Scanner::PatternPoint(int row_, int col_, std::vector<Pattern>& patterns_, 
 
 		if (!potential_)
 		{
-			if (p1.GetValue(true) != -1)
+			if (p1.GetValue(OFFENSIVE) != -1)
 			{
 				if (p1[0] == CellEmpty)
 				{
@@ -51,7 +82,7 @@ void Scanner::PatternPoint(int row_, int col_, std::vector<Pattern>& patterns_, 
 				else patterns_.push_back(p1);
 			}
 			
-			if (p2.GetValue(true) != -1)
+			if (p2.GetValue(OFFENSIVE) != -1)
 			{
 				if (p2[0] == CellEmpty)
 				{
@@ -63,8 +94,8 @@ void Scanner::PatternPoint(int row_, int col_, std::vector<Pattern>& patterns_, 
 		}
 		else // Searching for empty patterns
 		{
-			if (p1.Empty() && p1.GetValue(true) != -1 && p1.GetValue(false) != -1) patterns_.push_back(p1);
-			if (p2.Empty() && p2.GetValue(true) != -1 && p2.GetValue(false) != -1) patterns_.push_back(p2);
+			if (p1.Empty() && p1.GetValue(OFFENSIVE) != -1 && p1.GetValue(DEFENSIVE) != -1) patterns_.push_back(p1);
+			if (p2.Empty() && p2.GetValue(OFFENSIVE) != -1 && p2.GetValue(DEFENSIVE) != -1) patterns_.push_back(p2);
 		}
 	}
 }
@@ -72,14 +103,18 @@ void Scanner::PatternPoint(int row_, int col_, std::vector<Pattern>& patterns_, 
 Pattern Scanner::PatternDir(int row_, int col_, int dir_)
 {
 	Pattern temp_pattern(row_, col_, dir_, nullptr);
+	temp_pattern.SetValue(0, OFFENSIVE);
+	temp_pattern.SetValue(0, DEFENSIVE);
+	temp_pattern.SetValue(0, IMPORTANCE);
 
 	for (int offset = 0; offset < 5; offset++)
 	{
 		CellValue temp_cell = m_field->GetCell(row_, col_, dir_, offset);
 		if (temp_cell == CellOutside)
 		{
-			temp_pattern.SetValue(-1, true);
-			temp_pattern.SetValue(-1, false);
+			temp_pattern.SetValue(-1, OFFENSIVE);
+			temp_pattern.SetValue(-1, DEFENSIVE);
+			temp_pattern.SetValue(-1, IMPORTANCE);
 		}
 
 		temp_pattern[offset] = temp_cell;
@@ -111,7 +146,11 @@ bool Scanner::ValidatePattern(Pattern& pattern_)
 				break;
 			}
 
-		if (valid1 || valid2) return true;
+		if (valid1 || valid2)
+		{
+			pattern_.SetValue(important_patterns[i].GetValue(IMPORTANCE), IMPORTANCE);
+			return true;
+		}
 	}
 		
 	return false;

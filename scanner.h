@@ -4,6 +4,10 @@
 
 #include "field.h"
 
+#define OFFENSIVE 1
+#define DEFENSIVE 2
+#define IMPORTANCE 3
+
 struct Pattern
 {
 	Pattern() : m_offensive_value(0), m_defensive_value(0), m_dir(0), m_col(0), m_row(0)
@@ -11,11 +15,19 @@ struct Pattern
 		for (int i = 0; i < 5; i++) m_pattern[i] = CellUnknown;
 	}
 
-	Pattern(int row_, int col_, int dir_, CellValue pattern_[5]) : m_offensive_value(0), m_defensive_value(0), m_row(row_), m_col(col_), m_dir(dir_)
+	Pattern(int row_, int col_, int dir_, CellValue pattern_[5]) : m_offensive_value(0), m_defensive_value(0), m_importance_value(0), m_row(row_), m_col(col_), m_dir(dir_)
 	{
 		if (pattern_ != nullptr)
 			for (int i = 0; i < 5; i++) m_pattern[i] = pattern_[i];
 		else 
+			for (int i = 0; i < 5; i++) m_pattern[i] = CellUnknown;
+	}
+
+	Pattern(const CellValue pattern_[5], int value_) : m_offensive_value(0), m_defensive_value(0), m_importance_value(value_), m_row(0), m_col(0), m_dir(0)
+	{
+		if (pattern_ != nullptr)
+			for (int i = 0; i < 5; i++) m_pattern[i] = pattern_[i];
+		else
 			for (int i = 0; i < 5; i++) m_pattern[i] = CellUnknown;
 	}
 
@@ -56,18 +68,19 @@ struct Pattern
 		return true;
 	}
 
-	int GetValue(bool offensive_)
+	int GetValue(int type_)
 	{
-		if (offensive_) return m_offensive_value;
-		return m_defensive_value;
+		if (type_ == OFFENSIVE) return m_offensive_value;
+		if (type_ == DEFENSIVE) return m_defensive_value;
+		if (type_ == IMPORTANCE) return m_importance_value;
+		return -1;
 	}
 
-	void SetValue(int value_, bool offensive_)
+	void SetValue(int value_, int type_)
 	{
-		if (offensive_)
-			m_offensive_value = value_;
-		else
-			m_defensive_value = value_;
+		if (type_ == OFFENSIVE) m_offensive_value = value_;
+		else if (type_ == DEFENSIVE) m_defensive_value = value_;
+		else if (type_ == IMPORTANCE) m_importance_value = value_;
 	}
 
 	int m_row;
@@ -77,6 +90,7 @@ struct Pattern
 private:
 	int m_offensive_value;
 	int m_defensive_value;
+	int m_importance_value;
 	CellValue m_pattern[5];
 };
 

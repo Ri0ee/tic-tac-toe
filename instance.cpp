@@ -84,26 +84,54 @@ void Instance::FindBestPatterns(std::vector<Pattern>& offensive_patterns_, std::
 	for (auto pattern : all_patterns_) // Scanning for the best offensive and defensive patterns
 	{
 		int current_offensive_value = 0;
-		for (int i = 0; i < 5; i++) // Scan for offensive patterns
+		int current_defensive_value = 0;
+
+		if (pattern.GetValue(IMPORTANCE) > 0) 
 		{
-			if (pattern.GetValue(true) == -1) break;
-
-			if (pattern[i] == CellPlayer)
+			current_offensive_value = pattern.GetValue(IMPORTANCE);
+			current_defensive_value = pattern.GetValue(IMPORTANCE);
+		}
+		else
+		{
+			for (int i = 0; i < 5; i++) // Scan for offensive patterns
 			{
-				current_offensive_value++;
-				continue;
+				if (pattern.GetValue(OFFENSIVE) == -1) break;
+
+				if (pattern[i] == CellPlayer)
+				{
+					current_offensive_value += 26;
+					continue;
+				}
+
+				if (pattern[i] == CellEnemy || pattern[i] == CellOutside)
+				{
+					current_offensive_value = -1;
+					break;
+				}
 			}
 
-			if (pattern[i] == CellEnemy || pattern[i] == CellOutside)
+			for (int i = 0; i < 5; i++) // Scan for defensive patterns
 			{
-				current_offensive_value = -1;
-				break;
+				if (pattern.GetValue(DEFENSIVE) == -1) break;
+
+				if (pattern[i] == CellEnemy)
+				{
+					current_defensive_value += 26;
+					continue;
+				}
+
+				if (pattern[i] == CellPlayer || pattern[i] == CellOutside)
+				{
+					current_defensive_value = -1;
+					break;
+				}
 			}
+
+			pattern.SetValue(current_offensive_value, OFFENSIVE);
+			pattern.SetValue(current_defensive_value, DEFENSIVE);
 		}
 
-		pattern.SetValue(current_offensive_value, true);
-
-		if (current_offensive_value == 4) // On the next move there will be my win
+		if (current_offensive_value >= 104	) // On the next move there will be my win
 		{
 			offensive_patterns_.clear();
 			offensive_patterns_.push_back(pattern);
@@ -121,26 +149,6 @@ void Instance::FindBestPatterns(std::vector<Pattern>& offensive_patterns_, std::
 			offensive_patterns_.push_back(pattern);
 			valuable_pattern_offensive_value = current_offensive_value;
 		}
-
-		int current_defensive_value = 0;
-		for (int i = 0; i < 5; i++) // Scan for defensive patterns
-		{
-			if (pattern.GetValue(false) == -1) break;
-
-			if (pattern[i] == CellEnemy)
-			{
-				current_defensive_value++;
-				continue;
-			}
-
-			if (pattern[i] == CellPlayer || pattern[i] == CellOutside)
-			{
-				current_defensive_value = -1;
-				break;
-			}
-		}
-
-		pattern.SetValue(current_defensive_value, false);
 
 		if (current_defensive_value == valuable_pattern_defensive_value)
 			defensive_patterns_.push_back(pattern);
@@ -204,8 +212,8 @@ void Instance::MakeDecision(std::vector<Pattern>& offensive_patterns_, std::vect
 
 	int valuable_pattern_offensive_value = 0;
 	int valuable_pattern_defensive_value = 0;
-	if(!offensive_patterns_.empty()) valuable_pattern_offensive_value = offensive_patterns_[0].GetValue(true);
-	if(!defensive_patterns_.empty()) valuable_pattern_defensive_value = defensive_patterns_[0].GetValue(false);
+	if(!offensive_patterns_.empty()) valuable_pattern_offensive_value = offensive_patterns_[0].GetValue(OFFENSIVE);
+	if(!defensive_patterns_.empty()) valuable_pattern_defensive_value = defensive_patterns_[0].GetValue(DEFENSIVE);
 
 	for (int i = 0; i < 5; i++)
 	{
