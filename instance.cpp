@@ -40,15 +40,25 @@ bool Instance::Run()
 	if (m_info_step == true) return true;
 	if (m_state == false) return false;
 
+	int move_row = 0, move_col = 0;
+	SolutionDepth(0, move_row, move_col);
+
+	return WriteData(move_row, move_col);
+}
+
+void Instance::SolutionDepth(int iteration_, int& result_row_, int& result_col_)
+{
+	if (!m_field.SetDepth(iteration_)) return;
+
 	Scanner scanner(&m_field);
 	std::vector<Pattern> patterns;
 	std::vector<Pattern> offensive_patterns;
 	std::vector<Pattern> defensive_patterns;
-	int move_row = 0, move_col = 0;
 
 	scanner.Scan(patterns);
 
 #ifdef _DEBUG
+	std::cout << "Iteration: " << iteration_ << "\n";
 	for (auto pattern : patterns)
 	{
 		for (int i = 0; i < 5; i++)
@@ -63,9 +73,7 @@ bool Instance::Run()
 #endif // _DEBUG
 
 	FindBestPatterns(offensive_patterns, defensive_patterns, patterns);
-	MakeDecision(offensive_patterns, defensive_patterns, move_row, move_col);
-
-	return WriteData(move_row, move_col);;
+	MakeDecision(offensive_patterns, defensive_patterns, result_row_, result_col_);
 }
 
 void Instance::FindBestPatterns(std::vector<Pattern>& offensive_patterns_, std::vector<Pattern>& defensive_patterns_, std::vector<Pattern>& all_patterns_)

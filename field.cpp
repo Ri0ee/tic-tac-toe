@@ -3,9 +3,9 @@
 #ifdef _DEBUG
 void Field::DebugOutput()
 {
-	for(int row = 0; row < m_height; row++)
+	for(int row = 0; row < 10; row++)
 	{
-		for (int col = 0; col < m_width; col++)
+		for (int col = 0; col < 10; col++)
 		{
 			CellValue temp_cell = GetCell(row, col);
 			
@@ -33,11 +33,21 @@ void Field::DebugOutput()
 }
 #endif // _DEBUG
 
-void Field::Clear()
+void Field::Clear(int depth_)
 {
-	for (int row = 0; row < m_height; row++)
-		for (int col = 0; col < m_width; col++)
-			m_field[col][row] = CellEmpty;
+	if (depth_ == -1)
+	{
+		for (int row = 0; row < 10; row++)
+			for (int col = 0; col < 10; col++)
+				for(int depth = 1; depth < MAX_FIELD_DEPTH; depth++)
+					m_field[col][row][depth] = CellEmpty;
+	}
+	else
+	{
+		for (int row = 0; row < 10; row++)
+			for (int col = 0; col < 10; col++)
+				m_field[col][row][depth_] = CellEmpty;
+	}
 }
 
 bool Field::LoadFromFile(std::string& file_name_)
@@ -47,6 +57,10 @@ bool Field::LoadFromFile(std::string& file_name_)
 
 	std::fstream input_file(file_name_, std::ios::in);
 	if (!input_file.is_open()) return false;
+
+	Clear(-1);
+	m_depth_initialization_status[0] = true;
+	SetDepth(0);
 
 	for (int row = 0; row < 10; row++)
 	{

@@ -6,12 +6,8 @@ CellValue important_patterns[IMPORTANT_PATTERN_AMOUNT][5] =
 {
 {CellEmpty, CellEnemy,	CellEnemy,	CellEnemy,	CellEmpty},
 {CellEmpty, CellPlayer, CellPlayer, CellPlayer, CellEmpty},
-
-//{CellEmpty, CellEnemy,	CellEmpty, CellEmpty, CellEmpty},
-//{CellEmpty, CellPlayer, CellEmpty, CellEmpty, CellEmpty},
-
-{CellEmpty, CellEnemy,	CellEnemy,	CellEmpty, CellEmpty},
-{CellEmpty, CellPlayer, CellPlayer, CellEmpty, CellEmpty}
+{CellEmpty, CellEnemy, CellEnemy, CellEmpty, CellEnemy},
+{CellEnemy, CellEnemy, CellEmpty, CellEnemy, CellEmpty}
 };
 
 void Scanner::Scan(std::vector<Pattern>& patterns_)
