@@ -31,6 +31,19 @@ struct Pattern
 			for (int i = 0; i < 5; i++) m_pattern[i] = CellUnknown;
 	}
 
+	Pattern(const Pattern& pattern_)
+	{
+		m_dir = pattern_.m_dir;
+		m_row = pattern_.m_row;
+		m_col = pattern_.m_col;
+		for (int i = 0; i < 5; i++)
+			m_pattern[i] = pattern_[i];
+
+		m_defensive_value = pattern_.GetValue(DEFENSIVE);
+		m_offensive_value = pattern_.GetValue(OFFENSIVE);
+		m_importance_value = pattern_.GetValue(IMPORTANCE);
+	}
+
 	bool operator==(Pattern& pattern_)
 	{
 		for(int i = 0; i < 5; i++)
@@ -52,6 +65,11 @@ struct Pattern
 		return m_pattern[index_];
 	}
 
+	CellValue operator[](int index_) const
+	{
+		return m_pattern[index_];
+	}
+
 	bool Exists()
 	{
 		for (int i = 0; i < 5; i++)
@@ -68,7 +86,7 @@ struct Pattern
 		return true;
 	}
 
-	int GetValue(int type_)
+	int GetValue(int type_) const
 	{
 		if (type_ == OFFENSIVE) return m_offensive_value;
 		if (type_ == DEFENSIVE) return m_defensive_value;

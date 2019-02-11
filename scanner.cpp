@@ -30,8 +30,8 @@ void Scanner::Scan(std::vector<Pattern>& patterns_)
 	important_patterns.push_back(Pattern(static_patterns[1], 1000));
 	important_patterns.push_back(Pattern(static_patterns[2], 1000));
 	important_patterns.push_back(Pattern(static_patterns[3], 1000));
-	important_patterns.push_back(Pattern(static_patterns[4], 1000));
-	important_patterns.push_back(Pattern(static_patterns[5], 1000));
+	important_patterns.push_back(Pattern(static_patterns[4], 5000));
+	important_patterns.push_back(Pattern(static_patterns[5], 5000));
 
 	important_patterns.push_back(Pattern(static_patterns[6], 200));
 	important_patterns.push_back(Pattern(static_patterns[7], 300));

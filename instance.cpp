@@ -215,41 +215,57 @@ void Instance::MakeDecision(std::vector<Pattern>& offensive_patterns_, std::vect
 	if(!offensive_patterns_.empty()) valuable_pattern_offensive_value = offensive_patterns_[0].GetValue(OFFENSIVE);
 	if(!defensive_patterns_.empty()) valuable_pattern_defensive_value = defensive_patterns_[0].GetValue(DEFENSIVE);
 
+	Pattern pattern;
+	if (valuable_pattern_offensive_value < valuable_pattern_defensive_value)
+		pattern = defensive_patterns_[0];
+	else
+		pattern = offensive_patterns_[0];
+
+	int move_value = 0;
+	int good_move_index = 0;
+
 	for (int i = 0; i < 5; i++)
 	{
-		Pattern temp_pattern;
-		if (valuable_pattern_offensive_value < valuable_pattern_defensive_value)
-			temp_pattern = defensive_patterns_[0];
-		else
-			temp_pattern = offensive_patterns_[0];
-
-		if (temp_pattern[i] == CellEmpty)
+		if (pattern[i] == CellEmpty)
 		{
-			move_row_ = temp_pattern.m_row;
-			move_col_ = temp_pattern.m_col;
+			Pattern temp_pattern(pattern);
+			temp_pattern[i] = CellPlayer;
 
-			int dir = temp_pattern.m_dir;
-			bool positive = dir > 0;
-			if (dir == DIR_RIGHT || dir == DIR_LEFT)
-				move_col_ = positive ? move_col_ + i : move_col_ - i;
+			Scanner scanner(&m_field);
+			scanner.ValidatePattern(temp_pattern);
 
-			if (dir == DIR_TOP || dir == DIR_BOTTOM)
-				move_row_ = positive ? move_row_ - i : move_row_ + i;
+			int temp_value = std::max(temp_pattern.GetValue(OFFENSIVE), 
+				std::max(temp_pattern.GetValue(DEFENSIVE), temp_pattern.GetValue(IMPORTANCE)));
 
-			if (dir == DIR_TOP_RIGHT || dir == DIR_BOTTOM_LEFT)
+			if (move_value < temp_value)
 			{
-				move_col_ = positive ? move_col_ + i : move_col_ - i;
-				move_row_ = positive ? move_row_ - i : move_row_ + i;
+				move_value = temp_value;
+				good_move_index = i;
 			}
-
-			if (dir == DIR_TOP_LEFT || dir == DIR_BOTTOM_RIGHT)
-			{
-				move_col_ = positive ? move_col_ - i : move_col_ + i;
-				move_row_ = positive ? move_row_ - i : move_row_ + i;
-			}
-
-			break;
 		}
+	}
+
+	move_row_ = pattern.m_row;
+	move_col_ = pattern.m_col;
+
+	int dir = pattern.m_dir;
+	bool positive = dir > 0;
+	if (dir == DIR_RIGHT || dir == DIR_LEFT)
+		move_col_ = positive ? move_col_ + good_move_index : move_col_ - good_move_index;
+
+	if (dir == DIR_TOP || dir == DIR_BOTTOM)
+		move_row_ = positive ? move_row_ - good_move_index : move_row_ + good_move_index;
+
+	if (dir == DIR_TOP_RIGHT || dir == DIR_BOTTOM_LEFT)
+	{
+		move_col_ = positive ? move_col_ + good_move_index : move_col_ - good_move_index;
+		move_row_ = positive ? move_row_ - good_move_index : move_row_ + good_move_index;
+	}
+
+	if (dir == DIR_TOP_LEFT || dir == DIR_BOTTOM_RIGHT)
+	{
+		move_col_ = positive ? move_col_ - good_move_index : move_col_ + good_move_index;
+		move_row_ = positive ? move_row_ - good_move_index : move_row_ + good_move_index;
 	}
 }
 
