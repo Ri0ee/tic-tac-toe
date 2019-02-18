@@ -15,10 +15,10 @@ CellValue static_patterns[IMPORTANT_PATTERN_AMOUNT][5] =
 {CellEmpty,	CellEnemy,	CellEnemy,	CellEnemy,	CellEmpty},		// Open 3
 {CellEmpty,	CellPlayer,	CellPlayer, CellPlayer, CellEmpty},		// Open 3
 
-{CellEmpty,	CellEnemy,	CellEnemy,	CellEmpty,	CellEnemy},		// Open 3
-{CellEnemy,	CellEnemy,	CellEmpty,	CellEnemy,	CellEmpty},		// Open 3
+{CellEmpty,	CellEnemy,	CellEnemy,	CellEmpty,	CellEnemy},		// Open 3 Broken
+{CellEnemy,	CellEnemy,	CellEmpty,	CellEnemy,	CellEmpty},		// Open 3 
 {CellPlayer,CellPlayer,	CellEmpty,	CellPlayer,	CellEmpty},		// Open 3
-{CellEmpty,	CellPlayer,	CellPlayer,	CellEmpty,	CellPlayer},	// Open 3
+{CellEmpty,	CellPlayer,	CellPlayer,	CellEmpty,	CellPlayer},	// Open 3 Broken
 
 {CellEnemy,	CellPlayer,	CellPlayer, CellPlayer, CellEmpty},		// Closed 3
 {CellPlayer,CellEnemy,	CellEnemy,	CellEnemy,	CellEmpty}		// Closed 3
@@ -33,12 +33,13 @@ void Scanner::Scan(std::vector<Pattern>& patterns_)
 	important_patterns.push_back(Pattern(static_patterns[4], 5000));
 	important_patterns.push_back(Pattern(static_patterns[5], 5000));
 
-	important_patterns.push_back(Pattern(static_patterns[6], 200));
-	important_patterns.push_back(Pattern(static_patterns[7], 300));
-	important_patterns.push_back(Pattern(static_patterns[8], 200));
-	important_patterns.push_back(Pattern(static_patterns[9], 200));
+	important_patterns.push_back(Pattern(static_patterns[6], 400));
+	important_patterns.push_back(Pattern(static_patterns[7], 400));
+
+	//important_patterns.push_back(Pattern(static_patterns[8], 200));
+	important_patterns.push_back(Pattern(static_patterns[9], 300));
 	important_patterns.push_back(Pattern(static_patterns[10], 300));
-	important_patterns.push_back(Pattern(static_patterns[11], 300));
+	//important_patterns.push_back(Pattern(static_patterns[11], 300));
 
 	important_patterns.push_back(Pattern(static_patterns[12], 60));
 	important_patterns.push_back(Pattern(static_patterns[13], 50));
