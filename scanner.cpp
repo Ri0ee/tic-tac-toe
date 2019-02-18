@@ -5,12 +5,12 @@
 std::vector<Pattern> important_patterns;
 CellValue static_patterns[IMPORTANT_PATTERN_AMOUNT][5] =
 {
-{CellPlayer, CellPlayer, CellPlayer, CellPlayer, CellEmpty},	// 4
-{CellEnemy, CellEnemy,	CellEnemy,	CellEnemy,	CellEmpty},		// 4
-{CellPlayer, CellEmpty, CellPlayer, CellPlayer, CellPlayer},	// 4
-{CellEnemy, CellEmpty, CellEnemy, CellEnemy, CellEnemy},		// 4
-{CellPlayer, CellPlayer, CellEmpty, CellPlayer, CellPlayer},	// 4
-{CellEnemy, CellEnemy, CellEmpty, CellEnemy, CellEnemy},		// 4
+{CellPlayer,	CellPlayer,		CellPlayer,		CellPlayer,		CellEmpty},		// 4
+{CellEnemy,		CellEnemy,		CellEnemy,		CellEnemy,		CellEmpty},		// 4
+{CellPlayer,	CellEmpty,		CellPlayer,		CellPlayer,		CellPlayer},	// 4
+{CellEnemy,		CellEmpty,		CellEnemy,		CellEnemy,		CellEnemy},		// 4
+{CellPlayer,	CellPlayer,		CellEmpty,		CellPlayer,		CellPlayer},	// 4
+{CellEnemy,		CellEnemy,		CellEmpty,		CellEnemy,		CellEnemy},		// 4
 
 {CellEmpty,	CellEnemy,	CellEnemy,	CellEnemy,	CellEmpty},		// Open 3
 {CellEmpty,	CellPlayer,	CellPlayer, CellPlayer, CellEmpty},		// Open 3
@@ -26,11 +26,11 @@ CellValue static_patterns[IMPORTANT_PATTERN_AMOUNT][5] =
 
 void Scanner::Scan(std::vector<Pattern>& patterns_)
 {
-	important_patterns.push_back(Pattern(static_patterns[0], 1000));
-	important_patterns.push_back(Pattern(static_patterns[1], 1000));
-	important_patterns.push_back(Pattern(static_patterns[2], 1000));
-	important_patterns.push_back(Pattern(static_patterns[3], 1000));
-	important_patterns.push_back(Pattern(static_patterns[4], 5000));
+	important_patterns.push_back(Pattern(static_patterns[0], 5200));
+	important_patterns.push_back(Pattern(static_patterns[1], 5000));
+	important_patterns.push_back(Pattern(static_patterns[2], 5200));
+	important_patterns.push_back(Pattern(static_patterns[3], 5000));
+	important_patterns.push_back(Pattern(static_patterns[4], 5200));
 	important_patterns.push_back(Pattern(static_patterns[5], 5000));
 
 	important_patterns.push_back(Pattern(static_patterns[6], 400));
@@ -42,7 +42,7 @@ void Scanner::Scan(std::vector<Pattern>& patterns_)
 	//important_patterns.push_back(Pattern(static_patterns[11], 300));
 
 	important_patterns.push_back(Pattern(static_patterns[12], 60));
-	important_patterns.push_back(Pattern(static_patterns[13], 50));
+	important_patterns.push_back(Pattern(static_patterns[13], 70));
 
 	for (int row = 0; row < 10; row++)
 	{
@@ -75,22 +75,14 @@ void Scanner::PatternPoint(int row_, int col_, std::vector<Pattern>& patterns_, 
 		{
 			if (p1.GetValue(OFFENSIVE) != -1)
 			{
-				if (p1[0] == CellEmpty)
-				{
-					if (ValidatePattern(p1) == true)
-						patterns_.push_back(p1);
-				}
-				else patterns_.push_back(p1);
+				if(ValidatePattern(p1) == true || p1[0] != CellEmpty)
+					patterns_.push_back(p1);
 			}
 			
 			if (p2.GetValue(OFFENSIVE) != -1)
 			{
-				if (p2[0] == CellEmpty)
-				{
-					if (ValidatePattern(p2) == true)
-						patterns_.push_back(p2);
-				}
-				else patterns_.push_back(p2);
+				if(ValidatePattern(p2) == true || p2[0] != CellEmpty)
+					patterns_.push_back(p2);
 			}
 		}
 		else // Searching for empty patterns
@@ -156,3 +148,26 @@ bool Scanner::ValidatePattern(Pattern& pattern_)
 		
 	return false;
 }
+
+bool Scanner::DeadEndPattern(Pattern& pattern_)
+{
+	CellValue temp_cell = pattern_[0];
+	if (temp_cell != CellEnemy || temp_cell != CellPlayer)
+		return false;
+
+	int enemy_streak = (temp_cell == CellEnemy)? 1 : 0;
+	int player_streak = (temp_cell == CellPlayer)? 1 : 0;
+
+	for (int offset = 0; offset < 5; offset++)
+	{
+		CellValue temp_cell = pattern_[offset];
+		if (temp_cell == CellEnemy) enemy_streak++;
+		if (temp_cell == CellPlayer) player_streak++;
+	}
+
+	if(enemy_streak + player_streak == 5)
+		return true;
+
+	return false;
+}
+

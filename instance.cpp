@@ -68,6 +68,7 @@ void Instance::SolutionDepth(int iteration_, int& result_row_, int& result_col_)
 			if (pattern[i] == CellEmpty) std::cout << ". ";
 			if (pattern[i] == CellOutside) std::cout << "# ";
 		}
+		if (pattern.GetValue(IMPORTANCE) > 0) std::cout << "importance value: " << pattern.GetValue(IMPORTANCE);
 		std::cout << "\n";
 	}
 #endif // _DEBUG
@@ -236,6 +237,12 @@ void Instance::MakeDecision(std::vector<Pattern>& offensive_patterns_, std::vect
 
 			int temp_value = std::max(temp_pattern.GetValue(OFFENSIVE), 
 				std::max(temp_pattern.GetValue(DEFENSIVE), temp_pattern.GetValue(IMPORTANCE)));
+
+			if (scanner.DeadEndPattern(temp_pattern) == true)
+			{
+				good_move_index = i;
+				break;
+			}
 
 			if (move_value < temp_value)
 			{

@@ -122,6 +122,7 @@ public:
 	void PatternPoint(int row_, int col_, std::vector<Pattern>& patterns_, bool potential_);
 	Pattern PatternDir(int row_, int col_, int dir_);
 	bool ValidatePattern(Pattern& pattern_);
+	bool DeadEndPattern(Pattern& pattern_);
 
 private:
 	Field* m_field = nullptr;
