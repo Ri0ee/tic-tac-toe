@@ -118,7 +118,7 @@ Pattern Scanner::PatternDir(int row_, int col_, int dir_)
 
 bool Scanner::ValidatePattern(Pattern& pattern_)
 {
-	for (int i = 0; i < IMPORTANT_PATTERN_AMOUNT; i++)
+	for (int i = 0; i < important_patterns.size(); i++)
 	{
 		bool valid1 = true;
 		bool valid2 = true;

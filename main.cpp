@@ -12,7 +12,7 @@ int main(int argc, char* argv[])
 
 	std::vector<std::string> argv_vec;
 #ifdef _DEBUG
-	argv_vec.push_back("0");
+	argv_vec.push_back("X");
 	argv_vec.push_back("field.in");
 	argv_vec.push_back("field.out");
 #else
